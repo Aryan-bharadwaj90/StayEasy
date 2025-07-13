@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const Message = require("../Models/Message");
 const { protect } = require("../middlewares/authenticate");
 
-// Send a message
 router.post("/", async (req, res) => {
   try {
     const { text, sender, receiver, conversationId } = req.body;
@@ -15,12 +14,12 @@ router.post("/", async (req, res) => {
     const msg = await Message.create({ text, sender, receiver, conversationId });
     res.status(201).json(msg);
   } catch (err) {
-    console.error("❌ Error sending message:", err);
+    console.error("Error sending message:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// Get messages in a conversation
+
 router.get("/:conversationId", async (req, res) => {
   try {
     const msgs = await Message.find({ conversationId: req.params.conversationId })
@@ -28,12 +27,12 @@ router.get("/:conversationId", async (req, res) => {
       .populate("sender receiver", "name email");
     res.json(msgs);
   } catch (err) {
-    console.error("❌ Error getting conversation:", err);
+    console.error("Error getting conversation:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// ✅ Inbox for host — unique conversations
+
 router.get("/host/:hostId", async (req, res) => {
   try {
     const messages = await Message.find({ receiver: req.params.hostId })
@@ -57,7 +56,7 @@ router.get("/host/:hostId", async (req, res) => {
 
     res.json(uniqueConversations);
   } catch (err) {
-    console.error("❌ Failed to get host inbox", err);
+    console.error("Failed to get host inbox", err);
     res.status(500).json({ error: "Server error" });
   }
 });
