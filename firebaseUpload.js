@@ -3,13 +3,20 @@ const multer = require("multer");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 
-const serviceAccount = require("./firebase-key.json");
+//const serviceAccount = require("./firebase-key.json");
 
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   storageBucket: "stayeasy-e02ef", // Replace this
+// });
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  storageBucket: "stayeasy-e02ef", // Replace this
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  }),
+  storageBucket: "stayeasy-e02ef.appspot.com", // replace with your actual bucket if needed
 });
-
 const bucket = admin.storage().bucket();
 
 const storage = multer.memoryStorage(); // Store in memory first
