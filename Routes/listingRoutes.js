@@ -127,19 +127,46 @@ router.put("/:id", protect, async (req, res) => {
 });
 
 
+const { bucket } = require("../firebaseUpload"); 
+
+
+const extractFileNameFromUrl = (url) => {
+  const matches = decodeURIComponent(url).match(/\/o\/(.+)\?alt=media/);
+  return matches ? matches[1] : null;
+};
+
 router.delete("/:id", protect, async (req, res) => {
   try {
     const found = await listing.findById(req.params.id);
     if (!found) return res.status(404).json({ message: "Listing not found" });
-    if (found.host.toString() !== req.user.id) return res.status(403).json({ message: "Unauthorized" });
 
-    await found.remove();
-    res.json({ message: "Listing removed" });
+    if (found.host.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    
+    if (found.images && Array.isArray(found.images)) {
+      for (const imageUrl of found.images) {
+        const filename = extractFileNameFromUrl(imageUrl);
+        if (filename) {
+          try {
+            await bucket.file(filename).delete();
+            console.log(`Deleted file from Firebase: ${filename}`);
+          } catch (err) {
+            console.warn(`Failed to delete ${filename}:`, err.message);
+          }
+        }
+      }
+    }
+
+    await found.deleteOne(); 
+    res.json({ message: "Listing and images removed successfully" });
   } catch (err) {
     console.error("Error deleting listing:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", message: err.message });
   }
 });
+
 
 
 router.get("/host/:hostId", async (req, res) => {

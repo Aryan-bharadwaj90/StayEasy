@@ -34,4 +34,4 @@ const uploadToFirebase = async (file) => {
   return publicUrl;
 };
 
-module.exports = { upload, uploadToFirebase };
+module.exports = { upload, uploadToFirebase,bucket };
