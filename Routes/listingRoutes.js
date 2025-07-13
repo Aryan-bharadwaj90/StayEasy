@@ -136,7 +136,7 @@ require("dotenv").config();
 const express = require("express");
 const { upload, uploadToFirebase } = require("../firebaseUpload");
 const listing = require("../Models/listing");
-const Booking = require("../Models/Booking"); 
+const Booking = require("../Models/booking"); 
 const { geocode } = require("../utility/geocode");
 const { protect } = require("../middlewares/authenticate");
 
