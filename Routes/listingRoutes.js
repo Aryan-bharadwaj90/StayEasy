@@ -23,8 +23,7 @@ router.get("/search", async (req, res) => {
   if (maxPrice) query.pricePerNight = { ...query.pricePerNight, $lte: Number(maxPrice) };
   if (minRating) query.averageRating = { $gte: Number(minRating) };
 
-  // Optional enhancement: handle checkIn/checkOut using Booking model
-  // e.g., exclude listings that have conflicting bookings
+ 
 
   try {
     const listings = await listing.find(query);
@@ -59,7 +58,7 @@ router.post("/create", protect, upload.array("images", 5), async (req, res) => {
       }
 
       const { lat, lng } = geo;
-    // Upload each file to Firebase and get URLs
+    
     const imageUploadPromises = req.files.map((file) => uploadToFirebase(file));
     const imageUrls = await Promise.all(imageUploadPromises);
 
