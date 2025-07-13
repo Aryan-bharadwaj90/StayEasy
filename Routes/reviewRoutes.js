@@ -5,7 +5,7 @@ const Listing = require("../Models/listing");
 const Booking = require("../Models/booking");
 const { protect } = require("../middlewares/authenticate");
 
-// GET: Paginated Reviews for a Listing
+
 router.get("/:id/reviews", async (req, res) => {
   try {
     const { id } = req.params;
@@ -25,7 +25,7 @@ router.get("/:id/reviews", async (req, res) => {
   }
 });
 
-// POST: Add a Review
+
 router.post("/:id/reviews", protect, async (req, res) => {
   try {
     const { rating, comment } = req.body;
@@ -35,7 +35,7 @@ router.post("/:id/reviews", protect, async (req, res) => {
     if (!listing)
       return res.status(404).json({ message: "Listing not found" });
 
-    // Ensure user has stayed
+
     const hasStayed = await Booking.findOne({
       guest: req.user.id,
       listing: listingId,
