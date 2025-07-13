@@ -1,0 +1,36 @@
+const admin = require("firebase-admin");
+const multer = require("multer");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+
+const serviceAccount = require("./firebase-key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: "stayeasy-e02ef", // Replace this
+});
+
+const bucket = admin.storage().bucket();
+
+const storage = multer.memoryStorage(); // Store in memory first
+const upload = multer({ storage });
+
+const uploadToFirebase = async (file) => {
+  const filename = `${Date.now()}-${file.originalname}`;
+  const fileUpload = bucket.file(filename);
+  const uuid = uuidv4();
+
+  await fileUpload.save(file.buffer, {
+    metadata: {
+      contentType: file.mimetype,
+      metadata: {
+        firebaseStorageDownloadTokens: uuid,
+      },
+    },
+  });
+
+  const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filename)}?alt=media&token=${uuid}`;
+  return publicUrl;
+};
+
+module.exports = { upload, uploadToFirebase };
