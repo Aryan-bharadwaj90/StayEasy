@@ -34,23 +34,23 @@ app.use("/api/properties",require("./Routes/properties"));
 
 mongoose
   .connect(process.env.MONGO_URL)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log("❌ MongoDB Error:", err));
+  .then(() => console.log(" MongoDB Connected"))
+  .catch((err) => console.log(" MongoDB Error:", err));
 
 
 io.on("connection", (socket) => {
-  console.log("🟢 Socket connected:", socket.id);
+  console.log(" Socket connected:", socket.id);
 
   
   socket.on("join", (conversationId) => {
     socket.join(conversationId);
-    console.log(`📥 Joined room: ${conversationId}`);
+    console.log(` Joined room: ${conversationId}`);
   });
 
   
   socket.on("leave", (conversationId) => {
     socket.leave(conversationId);
-    console.log(`📤 Left room: ${conversationId}`);
+    console.log(` Left room: ${conversationId}`);
   });
 
   
@@ -59,7 +59,7 @@ io.on("connection", (socket) => {
       const { text, sender, receiver, conversationId } = data;
 
       if (!text || !sender || !receiver || !conversationId) {
-        console.error("❌ Missing required fields in message:", data);
+        console.error(" Missing required fields in message:", data);
         return;
       }
 
@@ -79,13 +79,13 @@ io.on("connection", (socket) => {
 
     } catch (err) {
       console.log("Hel");
-      console.error("❌ Error saving or sending message:", err);
+      console.error(" Error saving or sending message:", err);
     }
   });
   
   
   socket.on("disconnect", () => {
-    console.log("🔴 Socket disconnected:", socket.id);
+    console.log(" Socket disconnected:", socket.id);
   });
 });
 
