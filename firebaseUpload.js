@@ -15,7 +15,7 @@ admin.initializeApp({
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
   }),
-  storageBucket: "stayeasy-e02ef.appspot.com", // replace with your actual bucket if needed
+  storageBucket: "stayeasy-e02ef.firebasestorage.app", // replace with your actual bucket if needed
 });
 const bucket = admin.storage().bucket();
 
