@@ -78,7 +78,7 @@ io.on("connection", (socket) => {
       });
 
     } catch (err) {
-      console.log("Hel");
+      
       console.error(" Error saving or sending message:", err);
     }
   });
