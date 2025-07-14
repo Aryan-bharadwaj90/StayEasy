@@ -1,10 +1,11 @@
 require("dotenv").config();
 const express = require("express");
-const { upload, uploadToFirebase } = require("../firebaseUpload");
+const { upload, uploadToFirebase,bucket} = require("../firebaseUpload");
 const listing = require("../Models/listing");
 const Booking = require("../Models/booking"); 
 const { geocode } = require("../utility/geocode");
 const { protect } = require("../middlewares/authenticate");
+const multer = require("multer");
 
 const router = express.Router();
 
@@ -112,22 +113,62 @@ router.post("/create", protect, upload.array("images", 5), async (req, res) => {
 });
 
 
-router.put("/:id", protect, async (req, res) => {
+router.put("/:id", protect, upload.array("images", 5), async (req, res) => {
   try {
     const found = await listing.findById(req.params.id);
     if (!found) return res.status(404).json({ message: "Listing not found" });
-    if (found.host.toString() !== req.user.id) return res.status(403).json({ message: "Unauthorized" });
+    if (found.host.toString() !== req.user.id)
+      return res.status(403).json({ message: "Unauthorized" });
 
-    const updated = await listing.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const {
+      title,
+      description,
+      location,
+      pricePerNight,
+      existingImages, // stringified JSON
+    } = req.body;
+
+    // Parse existing images array
+    let updatedImages = [];
+    if (existingImages) {
+      try {
+        updatedImages = JSON.parse(existingImages);
+        if (!Array.isArray(updatedImages)) throw new Error("Invalid images array");
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid existingImages format" });
+      }
+    }
+
+    // Upload new images if provided
+    if (req.files && req.files.length > 0) {
+      const uploads = await Promise.all(req.files.map(uploadToFirebase));
+      updatedImages = [...updatedImages, ...uploads];
+    }
+
+    const geo = await geocode(location);
+    if (!geo) {
+      return res.status(400).json({ message: "Could not geocode the location" });
+    }
+
+    found.title = title;
+    found.description = description;
+    found.location = location;
+    found.pricePerNight = pricePerNight;
+    found.lat = geo.lat;
+    found.lng = geo.lng;
+    found.images = updatedImages;
+
+    await found.save();
+
+    res.json({ message: "Listing updated successfully", listing: found });
   } catch (err) {
     console.error("Error updating listing:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
 
-const { bucket } = require("../firebaseUpload"); 
+//const { bucket } = require("../firebaseUpload"); 
 
 
 const extractFileNameFromUrl = (url) => {
