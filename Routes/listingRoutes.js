@@ -125,10 +125,10 @@ router.put("/:id", protect, upload.array("images", 5), async (req, res) => {
       description,
       location,
       pricePerNight,
-      existingImages, // stringified JSON
+      existingImages, 
     } = req.body;
 
-    // Parse existing images array
+    
     let updatedImages = [];
     if (existingImages) {
       try {
@@ -139,7 +139,7 @@ router.put("/:id", protect, upload.array("images", 5), async (req, res) => {
       }
     }
 
-    // Upload new images if provided
+    
     if (req.files && req.files.length > 0) {
       const uploads = await Promise.all(req.files.map(uploadToFirebase));
       updatedImages = [...updatedImages, ...uploads];
