@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 
-app.use("/api/auth", require("./Routes/authRoutes"));
+app.use("/api/auth", require("./Routes/authenticateRoutes"));
 app.use("/api/listings", require("./Routes/listingRoutes"));
 app.use("/api/bookings", require("./Routes/bookingRoutes"));
 app.use("/api/reviews", require("./Routes/reviewRoutes"));
